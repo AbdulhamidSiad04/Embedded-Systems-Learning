@@ -3,12 +3,10 @@
 // Processor:     MC9S12XDP512
 // Bus Speed:     8MHz
 // Author:        Abdulhamid Siad
-// Details:      Implementing GPIO and Using AD2 To measure Frequencies            
+// Details:      Implementing GPIO and Using AD2 To measure Frequencies
 // Date:          25/07/31
 // Revision History :
 //  each revision will have a date + desc. of changes
-
-
 
 /********************************************************************/
 // Library includes
@@ -16,13 +14,12 @@
 #include <hidef.h>      /* common defines and macros */
 #include "derivative.h" /* derivative-specific definitions */
 
-//Other system includes or your includes go here
-//#include <stdlib.h>
-//#include <stdio.h>
-
+// Other system includes or your includes go here
+// #include <stdlib.h>
+// #include <stdio.h>
 
 /********************************************************************/
-//Defines
+// Defines
 /********************************************************************/
 #define Red_Led 0b10000000
 #define Yellow_Led 0b01000000
@@ -35,7 +32,9 @@
 /********************************************************************/
 // Global Variables
 /********************************************************************/
-
+unsigned int setPoint = 222;
+static unsigned long gCount = 0; // green LED counter
+static unsigned long rCount = 0; // red LED counter
 /********************************************************************/
 // Constants
 /********************************************************************/
@@ -45,48 +44,47 @@
 /********************************************************************/
 void main(void)
 {
-  //Any main local variables must be declared here
+  // Any main local variables must be declared here
 
   // main entry point
   _DISABLE_COP();
-  //EnableInterrupts;
-  
-/********************************************************************/
+  // EnableInterrupts;
+
+  /********************************************************************/
   // one-time initializations
-/********************************************************************/
+  /********************************************************************/
   PT1AD1 &= 0b00011111;  // Turn off LEDs before enabling outputs
   DDR01AD1 = 0b11100000; // Set LED pins to be outputs
   ATD1DIEN = 0b00011111; // Disable A-to-D button pins (22.3.2.69)
 
-
-/********************************************************************/
+  /********************************************************************/
   // main program loop
-/********************************************************************/
+  /********************************************************************/
 
   for (;;)
   {
-      unsigned long counter = 0;
+    unsigned long counter = 0;
     PT1AD1 ^= Green_Led;
-    // this is called blocking delay, will be trapped in the loop, 
+    // this is called blocking delay, will be trapped in the loop,
     // so the microcontrolled is not able to execute any other command
-    while(counter < 222)
-    {
-      // will want to gratually increase to reach 500000 so increment counter
-      counter++;
-    }
-    //if call counter =0 inside of {} while counter<500000 condition
-    //will always be true because it will never reach 500000 because 
-    //Each time we increase we reset so it never leaves 1 really.
-    //That why we have it outside of {} so then we can reset it,means
-    //It will only execurte when the loop finishes so condition == false(what we need)
-    //because Counter has now reached 500000
+    // while(counter < 222)
+    // {
+    //   // will want to gratually increase to reach 500000 so increment counter
+    //   counter++;
+    // }
+    // if call counter =0 inside of {} while counter<500000 condition
+    // will always be true because it will never reach 500000 because
+    // Each time we increase we reset so it never leaves 1 really.
+    // That why we have it outside of {} so then we can reset it,means
+    // It will only execurte when the loop finishes so condition == false(what we need)
+    // because Counter has now reached 500000
 
-    //If not reset will get blurry instead of steady blink because main runs forever
-    //each new led toggle needs 500000 count pause of program, so when first delay finished
-    //already sitting at 500000 and don't reset, then counter condition is already false
-    //so loop gets skipped and led keeps flipping almost instantly.
-    //Reseting just guarantees every cycle gets fresh start of 0 and leds keeos rhythm
-    counter =0;
+    // If not reset will get blurry instead of steady blink because main runs forever
+    // each new led toggle needs 500000 count pause of program, so when first delay finished
+    // already sitting at 500000 and don't reset, then counter condition is already false
+    // so loop gets skipped and led keeps flipping almost instantly.
+    // Reseting just guarantees every cycle gets fresh start of 0 and leds keeos rhythm
+    //  counter =0;
 
     /*---------------------------------------------------------------
   Delay-calculation notes  (for 500 Hz requirement)
@@ -105,7 +103,24 @@ void main(void)
   ⇒  while(counter < 222) { counter++; }   // gives ≈500 Hz
 ----------------------------------------------------------------*/
 
-  }                   
+    // increment both every loop (non-blocking)
+    gCount++;
+    rCount++;
+
+    // green LED: setpoint from your variable (example: 222 for ~500 Hz half-period)
+    if (gCount >= setPoint)
+    {
+      PT1AD1 ^= Green_Led; // toggle only when we hit the setpoint
+      gCount = 0;
+    }
+
+    // red LED: independent frequency (example: 1000)
+    if (rCount >= 222)
+    {
+      PT1AD1 ^= Red_Led; // toggle red independently
+      rCount = 0;
+    }
+  }
 }
 
 /********************************************************************/

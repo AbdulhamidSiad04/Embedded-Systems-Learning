@@ -1,5 +1,5 @@
 *** EVALUATION ***
-PROGRAM "C:\Users\Abdulhamifd Siad\OneDrive - NAIT\Desktop\Embedded System Learning\Assignments\ICA4 GPIOmcp\bin\Project.abs"
+PROGRAM "C:\Users\Abdulhamifd Siad\OneDrive - NAIT\Desktop\Embedded Systems Learning\Assignments\ICA4 GPIOmcp\bin\Project.abs"
 
 *********************************************************************************************
 TARGET SECTION
@@ -23,8 +23,9 @@ STARTUP SECTION
 Entry point: 0xC029 (_Startup)
 _startupData is allocated at 0xC031 and uses 6 Bytes
 extern struct _tagStartup {
-  unsigned nofZeroOut     0
-  _Copy    *toCopyDownBeg 0xC093
+  unsigned nofZeroOut     1
+  _Range   pZeroOut       0x2100     10
+  _Copy    *toCopyDownBeg 0xC0C7
 } _startupData;
 
 *********************************************************************************************
@@ -33,9 +34,10 @@ Section Name                    Size  Type     From       To       Segment
 ---------------------------------------------------------------------------------------------
 .init                             49     R     0xC000     0xC030   ROM_C000
 .startData                        34     R     0xC031     0xC052   ROM_C000
-.text                             59     R     0xC053     0xC08D   ROM_C000
-.copy                              2     R     0xC093     0xC094   ROM_C000
+.text                            111     R     0xC053     0xC0C1   ROM_C000
+.copy                              7     R     0xC0C7     0xC0CD   ROM_C000
 .stack                           256   R/W     0x2000     0x20FF   RAM
+.data                              2   R/W     0x2100     0x2101   RAM
 .abs_section_8                     1   N/I        0x8        0x8   .absSeg0
 .abs_section_9                     1   N/I        0x9        0x9   .absSeg1
 .abs_section_a                     1   N/I        0xA        0xA   .absSeg2
@@ -683,12 +685,13 @@ Section Name                    Size  Type     From       To       Segment
 .abs_section_3aa                   2   N/I      0x3AA      0x3AB   .absSeg644
 .abs_section_3ac                   2   N/I      0x3AC      0x3AD   .absSeg645
 .abs_section_3ae                   2   N/I      0x3AE      0x3AF   .absSeg646
-RUNTIME                            5     R     0xC08E     0xC092   ROM_C000
+.bss                               8   R/W     0x2102     0x2109   RAM
+RUNTIME                            5     R     0xC0C2     0xC0C6   ROM_C000
 .vectSeg647_vect                   2     R     0xFFFE     0xFFFF   .vectSeg647
 
 Summary of section sizes per section type:
-READ_ONLY (R):          97 (dec:      151)
-READ_WRITE (R/W):      100 (dec:      256)
+READ_ONLY (R):          D0 (dec:      208)
+READ_WRITE (R/W):      10A (dec:      266)
 NO_INIT (N/I):         300 (dec:      768)
 
 *********************************************************************************************
@@ -1293,7 +1296,7 @@ MODULE:                 -- mc9s12xdp512.c.o --
      _CAN2TXTSR                                 1FE       2       2       0   .abs_section_1fe
      _CAN3RXTSR                                 22E       2       2       0   .abs_section_22e
      _CAN3TXTSR                                 23E       2       2       0   .abs_section_23e
-     _PT01AD1                                   278       2       2       3   .abs_section_278
+     _PT01AD1                                   278       2       2       5   .abs_section_278
      _DDR01AD1                                  27A       2       2       1   .abs_section_27a
      _RDR01AD1                                  27C       2       2       0   .abs_section_27c
      _PER01AD1                                  27E       2       2       0   .abs_section_27e
@@ -1353,8 +1356,11 @@ MODULE:                 -- mc9s12xdp512.c.o --
      _XGR7                                      3AE       2       2       0   .abs_section_3ae
 MODULE:                 -- main.c.o --
 - PROCEDURES:
-     main                                      C053      3B      59       1   .text       
+     main                                      C053      6F     111       1   .text       
 - VARIABLES:
+     setPoint                                  2100       2       2       1   .data       
+     gCount                                    2102       4       4       8   .bss        
+     rCount                                    2106       4       4       8   .bss        
 MODULE:                 -- Start12.c.o --
 - PROCEDURES:
      Init                                      C000      29      41       1   .init       
@@ -1365,7 +1371,7 @@ MODULE:                 -- Start12.c.o --
      __SEG_END_SSTACK                          2100       0       0       1               
 MODULE:                 -- rtshc12.c.o (ansixs.lib) --
 - PROCEDURES:
-     _LINC                                     C08E       5       5       1   RUNTIME     
+     _LINC                                     C0C2       5       5       2   RUNTIME     
 - VARIABLES:
 
 *********************************************************************************************
@@ -1373,16 +1379,20 @@ MODULE STATISTIC
   Name                                      Data   Code  Const
 ---------------------------------------------------------------------------------------------
   mc9s12xdp512.c.o                           768      0      0
-  main.c.o                                     0     59      0
+  main.c.o                                    10    111      0
   Start12.c.o                                  0     49      0
   rtshc12.c.o (ansixs.lib)                     0      5      0
-  other                                      256     36      2
+  other                                      256     36      7
 
 *********************************************************************************************
 SECTION USE IN OBJECT-ALLOCATION SECTION
 ---------------------------------------------------------------------------------------------
 SECTION: ".text"
   main 
+SECTION: ".data"
+  setPoint 
+SECTION: ".bss"
+  gCount rCount 
 SECTION: ".init"
   Init _Startup 
 SECTION: ".abs_section_8"
@@ -3190,7 +3200,7 @@ OBJECT LIST SORTED BY ADDRESS
      _DDR1AD0                                   273       1       1       0   .abs_section_273
      _RDR1AD0                                   275       1       1       0   .abs_section_275
      _PER1AD0                                   277       1       1       0   .abs_section_277
-     _PT01AD1                                   278       2       2       3   .abs_section_278
+     _PT01AD1                                   278       2       2       5   .abs_section_278
      _DDR01AD1                                  27A       2       2       1   .abs_section_27a
      _RDR01AD1                                  27C       2       2       0   .abs_section_27c
      _PER01AD1                                  27E       2       2       0   .abs_section_27e
@@ -3333,10 +3343,13 @@ OBJECT LIST SORTED BY ADDRESS
      _XGR5                                      3AA       2       2       0   .abs_section_3aa
      _XGR6                                      3AC       2       2       0   .abs_section_3ac
      _XGR7                                      3AE       2       2       0   .abs_section_3ae
+     setPoint                                  2100       2       2       1   .data       
+     gCount                                    2102       4       4       8   .bss        
+     rCount                                    2106       4       4       8   .bss        
      Init                                      C000      29      41       1   .init       
      _Startup                                  C029       8       8       0   .init       
-     main                                      C053      3B      59       1   .text       
-     _LINC                                     C08E       5       5       1   RUNTIME     
+     main                                      C053      6F     111       1   .text       
+     _LINC                                     C0C2       5       5       2   RUNTIME     
 
 *********************************************************************************************
 UNUSED-OBJECTS SECTION
@@ -3356,7 +3369,13 @@ rtshc12.c.o (ansixs.lib):
 *********************************************************************************************
 COPYDOWN SECTION
 ---------------------------------------------------------------------------------------------
-------- ROM-ADDRESS: 0xC093 ---- SIZE       2 ---
+------- ROM-ADDRESS: 0xC0C7 ---- SIZE       4 ---
+Filling bytes inserted
+ 00012101
+------- ROM-ADDRESS: 0xC0CB ---- RAM-ADDRESS: 0x2101 ---- SIZE       1 ---
+Name of initialized Object : setPoint:1
+ DE
+------- ROM-ADDRESS: 0xC0CC ---- SIZE       2 ---
 Filling bytes inserted
  0000
 
@@ -3365,7 +3384,8 @@ OBJECT-DEPENDENCIES SECTION
 ---------------------------------------------------------------------------------------------
 Init                      USES _startupData 
 _Startup                  USES __SEG_END_SSTACK Init main 
-main                      USES _PT01AD1 _DDR01AD1 _ATD1DIEN _LINC 
+main                      USES _PT01AD1 _DDR01AD1 _ATD1DIEN gCount _LINC 
+                                rCount setPoint 
 
 *********************************************************************************************
 DEPENDENCY TREE
@@ -3389,5 +3409,5 @@ STATISTIC SECTION
 ExeFile:
 --------
 Number of blocks to be downloaded: 6
-Total size of all blocks to be downloaded: 151
+Total size of all blocks to be downloaded: 208
 
